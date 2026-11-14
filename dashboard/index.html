@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied launch value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="dot" aria-hidden="true"></span><h1>TOKEN RADAR</h1></div>
+  <p class="sub">Pre-token protocols, ranked by what a launch would be worth — from the DefiLlama snapshot alone.</p>
+  <p class="meta" id="meta">Loading snapshot…</p>
+  <p class="warn">“Records no token” means DefiLlama records no token — not proof a protocol has none. Implied values are this entry’s model, not a prediction of whether or when a token launches.</p>
+</header>
+
+<main id="boardView">
+  <section class="filters" aria-label="Filters">
+    <input id="q" type="search" placeholder="Search name or slug…" aria-label="Search">
+    <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+    <select id="chain" aria-label="Chain"><option value="">All chains</option></select>
+    <label class="chk"><input id="wl" type="checkbox"> Watchlist only</label>
+    <select id="minTvl" aria-label="Minimum TVL">
+      <option value="0">Any TVL</option>
+      <option value="50000000">TVL ≥ $50M</option>
+      <option value="100000000">TVL ≥ $100M</option>
+      <option value="500000000">TVL ≥ $500M</option>
+    </select>
+    <select id="sort" aria-label="Sort by">
+      <option value="value">Sort: implied value</option>
+      <option value="tvl">Sort: TVL</option>
+      <option value="growth">Sort: 7-day change</option>
+      <option value="age">Sort: age</option>
+    </select>
+    <span class="count" id="count"></span>
+  </section>
+
+  <section class="panel">
+    <table id="board">
+      <thead><tr>
+        <th data-k="rank">#</th><th data-k="name">Protocol</th><th data-k="category">Category</th>
+        <th>Chains</th><th data-k="tvl">TVL</th><th data-k="growth">7d</th><th data-k="age">Age</th>
+        <th data-k="value">Implied value</th><th>Farm: first step</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </section>
+
+  <section class="panel" id="method">
+    <h2>How the value is built</h2>
+    <p class="formula">implied value = TVL × category multiple × growth × age × breadth × quality</p>
+    <ul>
+      <li><b>Category multiple</b> — the median <i>mcap / TVL</i> of the tokened protocols in the same category, computed at run time from this snapshot (global median when a category has fewer than 5 tokened comparables), clamped to 0.02–1.00. MCap here is circulating market cap, not FDV, so the value is a circulating-mcap equivalent; a new token’s FDV would typically run 2–3× higher.</li>
+      <li><b>Growth</b> — 1 + 0.5 × clamp(7-day TVL change / 25%, −1, +1); a protocol growing 25%+ in a week earns the full 1.5×, one shrinking fast falls to 0.5×.</li>
+      <li><b>Age</b> — from <i>listed_at</i> to the snapshot date: under 6 months 0.85×, 6–12 months 0.95×, 1–4 years rising to 1.10×, then fading back toward 0.85× after 4 years without a token.</li>
+      <li><b>Breadth</b> — 1 + 0.08 × ln(chains), capped at 1.25×.</li>
+      <li><b>Quality</b> — 0.5× for Risk Curators and Onchain Capital Allocators: a curator’s vaults belong to the underlying strategies, so a curator token would not capture their TVL. Everything else 1.0×.</li>
+    </ul>
+    <h3>Who counts as a launch candidate</h3>
+    <p>A protocol records no token (<i>gecko_id</i> and <i>symbol</i> both null) and is not a wrapped, staked or bridged product of a token that already trades: category not Bridge, Canonical Bridge, Cross Chain Bridge, Liquid Staking, Liquid Restaking, Restaked BTC or CEX; name with no whole word <i>wrapped / staked / staking</i>, no trailing version marker, and no exchange prefix. The 40-protocol watchlist is the floor, never the ceiling — this board ranks every candidate the snapshot holds, 100+ rows.</p>
+    <h3>What this board does not know</h3>
+    <p>The snapshot carries no fees, revenue, users, funding, audits or points programs, so none of those enter the model. Gas figures in the farm plans are the builder’s November 2026 estimates, not snapshot data. Farm plans position a reader for a possible launch; they never promise an airdrop, a token amount, or a date.</p>
+    <h3>Category multiples used</h3>
+    <table id="mults"><thead><tr><th>Category</th><th>Multiple</th><th>Tokened comparables</th><th>Source</th></tr></thead><tbody></tbody></table>
+  </section>
+</main>
+
+<main id="detailView" hidden>
+  <p><a href="#/board" class="back">← Back to the board</a></p>
+  <section class="panel" id="detail"></section>
+</main>
+
+<footer><p>Token Radar · built from the sealed DefiLlama snapshot of 2026-11-14 · all figures from the snapshot unless labelled an estimate.</p></footer>
+<script src="farm.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
